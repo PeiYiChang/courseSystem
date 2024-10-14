@@ -65,7 +65,7 @@ const submit = () => {
                 <select
                     id="major"
                     type="text"
-                    class="mt-1 block w-full"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                     v-model="form.major"
                     required
                     autocomplete="username"
@@ -85,7 +85,7 @@ const submit = () => {
                 <select
                     id="grade"
                     type="text"
-                    class="mt-1 block w-full"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                     v-model="form.grade"
                     required
                     autocomplete="username"
