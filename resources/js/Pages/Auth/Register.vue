@@ -8,6 +8,9 @@ import { Head, Link, useForm } from '@inertiajs/vue3';
 
 const form = useForm({
     name: '',
+    studentID: '',
+    major: '',
+    grade: '',
     email: '',
     password: '',
     password_confirmation: '',
@@ -39,6 +42,62 @@ const submit = () => {
                 />
 
                 <InputError class="mt-2" :message="form.errors.name" />
+            </div>
+
+            <div class="mt-4">
+                <InputLabel for="studentID" value="Student ID" />
+
+                <TextInput
+                    id="studentID"
+                    type="text"
+                    class="mt-1 block w-full"
+                    v-model="form.studentID"
+                    required
+                    autocomplete="username"
+                />
+
+                <InputError class="mt-2" :message="form.errors.studentID" />
+            </div>
+
+            <div class="mt-4">
+                <InputLabel for="major" value="Major" />
+
+                <select
+                    id="major"
+                    type="text"
+                    class="mt-1 block w-full"
+                    v-model="form.major"
+                    required
+                    autocomplete="username"
+                >
+                <option value="Computer Science">Computer Science</option>
+                <option value="Computer Science">Electrical Engineer</option>
+                <option value="Computer Science">Literature and History of America</option>
+
+                </select>
+
+                <InputError class="mt-2" :message="form.errors.major" />
+            </div>
+
+            <div class="mt-4">
+                <InputLabel for="grade" value="Grade" />
+
+                <select
+                    id="grade"
+                    type="text"
+                    class="mt-1 block w-full"
+                    v-model="form.grade"
+                    required
+                    autocomplete="username"
+                >
+                <option value="1">1st</option>
+                <option value="2">2nd</option>
+                <option value="3">3rd</option>
+                <option value="4">4th</option>
+
+                </select>
+
+                <InputError class="mt-2" :message="form.errors.grade" />
             </div>
 
             <div class="mt-4">
