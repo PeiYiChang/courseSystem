@@ -24,4 +24,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+// routes to /finder and /regiser
+Route::get('/finder', function (){
+    return Inertia::render('Finder');
+})->name('finder');
+
+Route::get('/course-register', function () {
+    return Inertia::render('CourseRegister'); // Assuming the view name is still Register.vue
+})->name('course-register');
+
 require __DIR__.'/auth.php';
