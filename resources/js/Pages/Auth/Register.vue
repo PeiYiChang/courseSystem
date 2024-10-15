@@ -72,7 +72,7 @@ const submit = () => {
                 >
                 <option value="Computer Science">Computer Science</option>
                 <option value="Computer Science">Electrical Engineer</option>
-                <option value="Computer Science">Literature and History of America</option>
+                <option value="Computer Science">Literature and History</option>
 
                 </select>
 
