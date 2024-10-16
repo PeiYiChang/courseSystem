@@ -16,9 +16,10 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('studentID', 20) -> uniqid();
+            $table->string('studentID', 20) -> unique();
             $table->string('major', 50);
             $table->integer('grade')-> default(1);
+            $table->integer('credit')-> default(0);
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();

@@ -15,11 +15,12 @@ const form = useForm({
     coursePeriod: '',
 });
 
-// const submit () => {
-//     form.post(route(), {
-//         //onFinish: () 
-//     })
-// };
+const submit = () => {
+    form.post(route('course.filter'), {
+        onFinish: () => form.reset()
+    });
+};
+
 </script>
 
 <template>
@@ -75,8 +76,10 @@ const form = useForm({
                                     <InputLabel for="courseDay" value="Course Day" />
                                     <select id="courseDay" type="text"
                                         class="mt-1 block w-full p-2 border border-gray-300 rounded min-w-[186px]"
-                                        v-model="form.courseDay">
+                                        v-model="form.courseDay"
+                                        >
 
+                                        <!-- <option value="" disabled selected>Select a day</option> -->
                                         <option value="1">Monday</option>
                                         <option value="2">Tuesday</option>
                                         <option value="3">Wednesday</option>
@@ -99,6 +102,7 @@ const form = useForm({
                                         class="mt-1 block w-full p-2 border border-gray-300 rounded min-w-[186px]"
                                         v-model="form.coursePeriod">
 
+                                        <!-- <option value="" disabled selected>Select a day</option> -->
                                         <option value="1">1 (08:10-09:00)</option>
                                         <option value="2">2 (09:10-10:00)</option>
                                         <option value="3">3 (10:10-11:00)</option>
@@ -123,7 +127,8 @@ const form = useForm({
                                 </PrimaryButton>
 
                                 <DangerButton class="mt-1 block w-1/7" :class="{ 'opacity-25': form.processing }"
-                                    :disabled="form.processing">
+                                    :disabled="form.processing"
+                                    @click = "form.reset()">
                                     Clear
                                 </DangerButton>
                             </div>
