@@ -5,8 +5,12 @@ import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import DangerButton from '@/Components/DangerButton.vue';
+import Table from '@/Components/Table.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
+import { NButton } from 'naive-ui';
 
+
+// TO BE UPDATED: Filter area and Courses Index area can be seperated to two components => ease up the readability
 const form = useForm({
     courseID: '',
     courseTitle: '',
@@ -21,6 +25,10 @@ const submit = () => {
     });
 };
 
+// Receive the filtered courses from the controller as props
+defineProps({
+    courses: Array, // The filtered courses passed from the controller
+});
 </script>
 
 <template>
@@ -30,38 +38,40 @@ const submit = () => {
     <AuthenticatedLayout>
         <template #header>
             <h2 class="text-xl font-semibold leading-tight text-gray-800">
-                Explore Courses
+                Finder
             </h2>
         </template>
         <form @submit.prevent="submit">
             <div class="py-12">
                 <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                        <!-- Finder Board Section -->
+                        <!-- Finder Board -->
+                        <h2 class="text-lg font-medium text-gray-900 p-6">
+                            Explore Courses
+                        </h2>
                         <div class="p-6 text-gray-900">
                             Use the form below to search and explore available courses.<br />
                             Fill in the details to find courses that match your interests or schedule.
                         </div>
 
-                        <!-- Form Section with aligned and spaced inputs -->
                         <div class="p-6 text-gray-900">
-                            <div class="flex justify-start gap-x-8">
+                            <div class="flex flex-wrap justify-start gap-x-8">
                                 <!-- Course ID Input -->
-                                <div>
+                                <div class="flex-none w-64 min-w-[150px]">
                                     <InputLabel for="courseID" value="Course ID" />
                                     <TextInput id="courseID" type="text" class="mt-1 block w-full"
                                         placeholder="Course ID" v-model="form.courseID" />
                                 </div>
 
                                 <!-- Course Title Input -->
-                                <div>
+                                <div class="flex-none w-64 min-w-[150px]">
                                     <InputLabel for="courseTitle" value="Course Title" />
                                     <TextInput id="courseTitle" type="text" class="mt-1 block w-full"
                                         placeholder="Course Title" v-model="form.courseTitle" />
                                 </div>
 
                                 <!-- Course Instructor Input -->
-                                <div>
+                                <div class="flex-none w-64 min-w-[150px]">
                                     <InputLabel for="courseInstructor" value="Course Instructor" />
                                     <TextInput id="courseInstructor" type="text" class="mt-1 block w-full"
                                         placeholder="Course Instructor" v-model="form.courseInstructor" />
@@ -70,14 +80,13 @@ const submit = () => {
 
                             </div>
 
-                            <div class="flex justify-start gap-x-8 gap-y-8 mt-5 mb-2">
+                            <div class="flex flex-wrap justify-start gap-x-8 gap-y-8 mt-5 mb-2">
                                 <!-- Course Day Input -->
-                                <div>
+                                <div class="flex-none w-64 min-w-[150px]">
                                     <InputLabel for="courseDay" value="Course Day" />
                                     <select id="courseDay" type="text"
                                         class="mt-1 block w-full p-2 border border-gray-300 rounded min-w-[186px]"
-                                        v-model="form.courseDay"
-                                        >
+                                        v-model="form.courseDay">
 
                                         <!-- <option value="" disabled selected>Select a day</option> -->
                                         <option value="1">Monday</option>
@@ -91,12 +100,12 @@ const submit = () => {
                                 </div>
 
                                 <!-- Course Period Input -->
-                                <div>
+                                <div class="flex-none w-64 min-w-[150px]">
                                     <InputLabel for="coursePeriod" value="Course Period" />
                                     <TextInput id="coursePeriod" type="text" class="mt-1 block w-full"
                                         placeholder="Course Period" v-model="form.coursePeriod" />
                                 </div>
-                                <div>
+                                <div class="flex-none w-64 min-w-[150px]">
                                     <InputLabel for="coursePeriod" value="Course Period" />
                                     <select id="coursePeriod" type="text"
                                         class="mt-1 block w-full p-2 border border-gray-300 rounded min-w-[186px]"
@@ -127,14 +136,25 @@ const submit = () => {
                                 </PrimaryButton>
 
                                 <DangerButton class="mt-1 block w-1/7" :class="{ 'opacity-25': form.processing }"
-                                    :disabled="form.processing"
-                                    @click = "form.reset()">
+                                    :disabled="form.processing" @click="form.reset()">
                                     Clear
                                 </DangerButton>
                             </div>
                         </div>
                     </div>
 
+                </div>
+                
+            </div>
+            <!-- show filtered course info -->
+            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8 pb-8">
+                <div
+                    class="overflow-hidden bg-white shadow-sm sm:rounded-lg"
+                >
+                        <h2 class="text-lg font-medium text-gray-900 p-6">
+                            Filtered Courses
+                        </h2>
+                        <Table/>
                 </div>
             </div>
         </form>

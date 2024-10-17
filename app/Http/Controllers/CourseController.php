@@ -8,7 +8,15 @@ use Illuminate\Http\Request;
 class CourseController extends Controller
 {
     public function filter(Request $request)
-    {
+    {   
+        $request->validate([
+            'courseID' => 'nullable|string',
+            'courseTitle' => 'nullable|string',
+            'courseInstructor' => 'nullable|string',
+            'courseDay' => 'nullable|integer',
+            'coursePeriod' => 'nullable|integer',
+        ]);
+        
         $query = Course::query();
 
         // Apply filters based on user input
@@ -37,6 +45,7 @@ class CourseController extends Controller
 
         // Return the results to the view or as JSON for API response
         return inertia('Index', ['courses' => $courses]);
+        //return response()->json($courses);
 
     }
 }

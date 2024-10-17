@@ -1,4 +1,7 @@
 <template>
+
+
+
     <div>
         <h1>Filtered Courses</h1>
 
