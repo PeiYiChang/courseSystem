@@ -23,8 +23,13 @@ const form = useForm({
 
 const submit = () => {
     form.post(route('course.filter'), {
-        onFinish: () => form.reset()
+        onSuccess: () => form.reset(),
+        //onFailure: () => form.reset()
     });
+};
+
+const clear = () => {
+    form.reset();
 };
 
 const props = defineProps({
@@ -138,7 +143,7 @@ const props = defineProps({
                                 </PrimaryButton>
 
                                 <DangerButton class="mt-1 block w-1/7" :class="{ 'opacity-25': form.processing }"
-                                    :disabled="form.processing" @click="form.reset()">
+                                    :disabled="form.processing" @click="clear">
                                     Clear
                                 </DangerButton>
                             </div>

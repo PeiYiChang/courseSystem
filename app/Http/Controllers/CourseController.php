@@ -47,6 +47,7 @@ class CourseController extends Controller
 
         $formattedCourses = $courses->map(function ($course) {
             return [
+                'id' => $course->id,
                 'courseID' => $course->courseID,
                 'courseTitle' => $course->courseTitle,
                 'credit' => $course->credit,
