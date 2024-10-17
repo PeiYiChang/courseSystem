@@ -6,8 +6,10 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import DangerButton from '@/Components/DangerButton.vue';
 import Table from '@/Components/Table.vue';
+import DataTable from '@/Pages/DataTable.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
-import { NButton } from 'naive-ui';
+
+
 
 
 // TO BE UPDATED: Filter area and Courses Index area can be seperated to two components => ease up the readability
@@ -25,10 +27,10 @@ const submit = () => {
     });
 };
 
-// Receive the filtered courses from the controller as props
-defineProps({
-    courses: Array, // The filtered courses passed from the controller
+const props = defineProps({
+    courses: Array // The filtered courses passed from the controller
 });
+
 </script>
 
 <template>
@@ -154,7 +156,8 @@ defineProps({
                         <h2 class="text-lg font-medium text-gray-900 p-6">
                             Filtered Courses
                         </h2>
-                        <Table/>
+                        <!-- <Table/> -->
+                        <DataTable :data="courses" />
                 </div>
             </div>
         </form>

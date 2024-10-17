@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class CourseController extends Controller
 {
@@ -42,10 +43,25 @@ class CourseController extends Controller
 
         // Fetch the filtered results
         $courses = $query->get();
+        // \Log::info($query->toSql());
 
-        // Return the results to the view or as JSON for API response
-        return inertia('Index', ['courses' => $courses]);
-        //return response()->json($courses);
+        $formattedCourses = $courses->map(function ($course) {
+            return [
+                'courseID' => $course->courseID,
+                'courseTitle' => $course->courseTitle,
+                'credit' => $course->credit,
+                'mandatory' => $course->mandatory,
+                'instructor' => $course->instructor,
+                'major' => $course->major,
+                'grade' => $course->grade,
+                'time' => $course->day . ' ' . $course->period, 
+            ];
+        });
+        //dd($formattedCourses);
+        
+        
+        return Inertia::render('Finder', ['courses' => $formattedCourses->toArray(),]);
+        
 
     }
 }
