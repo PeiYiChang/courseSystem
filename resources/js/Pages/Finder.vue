@@ -24,7 +24,6 @@ const form = useForm({
 const submit = () => {
     form.post(route('course.filter'), {
         onSuccess: () => form.reset(),
-        //onFailure: () => form.reset()
     });
 };
 
@@ -56,7 +55,7 @@ const props = defineProps({
                         <h2 class="text-lg font-medium text-gray-900 p-6">
                             Explore Courses
                         </h2>
-                        <div class="p-6 text-gray-900">
+                        <div class="px-6 text-gray-900">
                             Use the form below to search and explore available courses.<br />
                             Fill in the details to find courses that match your interests or schedule.
                         </div>
