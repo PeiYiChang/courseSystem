@@ -87,4 +87,52 @@ class CourseController extends Controller
     return Inertia::render('Finder', ['courses' => $formattedCourses]);
 }
 
+public function indexOne(Request $request)
+{
+    // Validate that courseID is present in the request
+    $request->validate([
+        'courseID' => 'required|string', // Adjust validation rules as needed
+    ]);
+
+    // Get the courseID from the request
+    $courseID = $request->input('courseID');
+
+    // Query the Course model for the specified courseID
+    $courseInfo = Course::where('courseID', $courseID)->first(); // Use first() to get a single course
+
+    // If the course is not found, you might want to handle that
+    if (!$courseInfo) {
+        return response()->json(['message' => 'Course not found'], 404);
+    }
+
+    // Create a mapping for days
+    $dayMap = [
+        1 => 'Mon',
+        2 => 'Tue',
+        3 => 'Wed',
+        4 => 'Thu',
+        5 => 'Fri',
+        6 => 'Sat',
+        7 => 'Sun',
+    ];
+
+    // Format the course time directly in this method
+    $time = $dayMap[$courseInfo->day] . '-' . $courseInfo->period;
+
+    // Format the course information
+    $formattedCourses = [
+        'id' => $courseInfo->id, // Assuming you want to return the model's ID
+        'courseID' => $courseInfo->courseID,
+        'courseTitle' => $courseInfo->courseTitle,
+        'credit' => $courseInfo->credit,
+        'mandatory' => $courseInfo->mandatory,
+        'instructor' => $courseInfo->instructor,
+        'grade' => $courseInfo->grade,
+        'major' => $courseInfo->major,
+        'time' => $time, // Use the formatted time directly
+    ];
+
+    return Inertia::render('CourseRegister', ['courseInfo' => [$formattedCourses]]); // Wrap in an array
+}
+
 }

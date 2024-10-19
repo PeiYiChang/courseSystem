@@ -26,7 +26,7 @@ function createColumns({
         { title: "Grade", key: "grade" },
         { title: "Time", key: "time" },
         {
-            title: "Watch List",
+            title: "Enrollment",
             key: "actions",
             render(row) {
                 const isInWatchList = watchList.has(row.courseID)
@@ -119,7 +119,7 @@ export default defineComponent({
             watchList: watchList.value
         });
         const pagination = {
-            pageSize: 6,
+            pageSize: 1,
         };
 
         return {

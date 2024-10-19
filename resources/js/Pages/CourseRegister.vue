@@ -6,11 +6,12 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import DangerButton from '@/Components/DangerButton.vue';
 import Table from '@/Components/Table.vue';
+import showCourseInfo from '@/Components/showCourseInfo.vue';
 import WatchList from '@/Components/CMwatchList.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { NCollapse } from 'naive-ui';
-import axios from 'axios';
 import { ref, onMounted } from 'vue';
+import ShowCourseInfo from '@/Components/showCourseInfo.vue';
 
 // check if student is already enrolled in the class
 const has_course = ref(false);
@@ -21,11 +22,15 @@ const form = useForm({
     courseID: ''
 });
 
-const clear = () => {
-    form.reset();
+const submit = () => {
+    form.get(route('filter.indexOne'), {
+        onSuccess: () => form.reset(),
+    });
 };
 
-
+const props = defineProps({
+    courseInfo: Array // The filtered courses passed from the controller
+});
 
 
 </script>
@@ -94,6 +99,7 @@ const clear = () => {
                                 </PrimaryButton>
                                 
                             </div>
+                            <ShowCourseInfo :data="courseInfo" />
                         </div>
                     </div>
 

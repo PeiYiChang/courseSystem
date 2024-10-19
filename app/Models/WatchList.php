@@ -15,10 +15,6 @@ class WatchList extends Model
         return $this->belongsTo(User::class, 'studentID', 'studentID');
     }
 
-    public function course()
-    {
-        return $this->belongsTo(Course::class, 'courseID', 'courseID'); // Assuming courseID is the key in the Course model
-    }
 }
 
 /*

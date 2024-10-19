@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('courses', function (Blueprint $table) {
             $table->id(); //autoincrement
-            $table->string('courseID')->unique();
+            $table->string('courseID');
             $table->string('courseTitle');
             $table->integer('credit');
             $table->boolean('mandatory');

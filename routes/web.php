@@ -48,6 +48,7 @@ Route::post('/watchlist/add', [WatchListController::class, 'store'])->name('watc
 Route::post('/watchlist/remove', [WatchListController::class, 'drop'])->name('watchlist.remove');
 Route::get('/watchlist', [WatchListController::class, 'index'])->name('watchlist.index');
 
-
-
+Route::post('/register', [EnrollmentController::class, 'register'])->name('enrollment.register');
+Route::post('/deregister', [EnrollmentController::class, 'deregister'])->name('enrollment.deregister');
+Route::get('indexOne', [CourseController::class, 'indexOne'])->name('filter.indexOne');
 require __DIR__.'/auth.php';
