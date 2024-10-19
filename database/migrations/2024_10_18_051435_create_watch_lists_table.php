@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('watch_lists', function (Blueprint $table) {
             $table->id();
             $table->string('studentID');
-            $table->string('courseID')->unique();
+            $table->string('courseID');
             $table->timestamps();
             
             // Foreign key constraints
