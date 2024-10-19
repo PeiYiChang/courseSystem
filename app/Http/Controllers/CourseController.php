@@ -94,6 +94,6 @@ class CourseController extends Controller
         }
     
         return Inertia::render('Finder', ['courses' => $formattedCourses]);
+        
     }
-    
 }

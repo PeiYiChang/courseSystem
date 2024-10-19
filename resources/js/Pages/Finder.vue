@@ -6,7 +6,7 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import DangerButton from '@/Components/DangerButton.vue';
 import Table from '@/Components/Table.vue';
-import DataTable from '@/Pages/DataTable.vue';
+import DataTable from '@/Components/FilteredCourse.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 
 

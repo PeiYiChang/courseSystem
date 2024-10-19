@@ -6,10 +6,11 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import DangerButton from '@/Components/DangerButton.vue';
 import Table from '@/Components/Table.vue';
-import DataTable from '@/Pages/DataTable.vue';
+import WatchList from '@/Components/WatchList.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { NCollapse } from 'naive-ui';
-import { ref } from 'vue';
+import axios from 'axios';
+import { ref, onMounted } from 'vue';
 
 // check if student is already enrolled in the class
 const has_course = ref(false);
@@ -17,11 +18,7 @@ const searched = ref(false);
 
 // TO BE UPDATED: Filter area and Courses Index area can be seperated to two components => ease up the readability
 const form = useForm({
-    courseID: '',
-    courseTitle: '',
-    courseInstructor: '',
-    courseDay: '',
-    coursePeriod: '',
+    courseID: ''
 });
 
 // const submit = () => {
@@ -30,10 +27,44 @@ const form = useForm({
 //         //onFailure: () => form.reset()
 //     });
 // };
-
+// const props = defineProps({
+//     watchListData: Array // The filtered courses passed from the controller
+// });
+// const submit = () => {
+//     form.get(route('watchlist.index'), {
+//         onSuccess: () => form.reset(),
+//     });
+// };
 const clear = () => {
     form.reset();
 };
+
+const updateWatchList = () => {
+    console.log('Updating watchlist...');
+    get(route('watchlist.index'))
+    
+};
+
+// const watchListData = ref([]);
+
+// onMounted(() => {
+//     axios.get(route('watchlist.index'))
+//     .then(response => {
+//             // Check if response.data is an array
+//             if (Array.isArray(response.data)) {
+//                 watchListData.value = response.data.map(course => ({
+//                     label: course.courseTitle, // Adjust the key to match your structure
+//                     key: course.courseID
+//                 }));
+//             }else{
+//                 console.log("not an array, response data:", response.data);
+//             }
+//         })
+//         .catch(error => {
+//             console.error("Error fetching watchlist data:", error);
+//         });
+// });
+
 
 </script>
 
@@ -79,6 +110,7 @@ const clear = () => {
                                 class="mt-1 block w-1/7"
                                 :class="{ 'opacity-25': form.processing }" 
                                 :disabled="form.processing"
+                                @click = "submit"
                                 >
                                 Search
                                 </SecondaryButton>
@@ -122,10 +154,10 @@ const clear = () => {
             <!-- show Watch list courses -->
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8 pb-8">
                 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                    <n-collapse>
+                    <n-collapse :on-item-header-click="updateWatchList"	>
                     <n-collapse-item title="My Watch List" name="2" class="text-lg font-medium text-gray-900 p-6">
                     <!-- <Table/> -->
-                    <DataTable :data="courses" />
+                    <WatchList />
                 </n-collapse-item>
                 </n-collapse>
                 </div>

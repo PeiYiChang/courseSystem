@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CourseController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\WatchListController;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -37,5 +38,11 @@ Route::post('/course-drop', [CourseController::class, 'drop'])->name('course.dro
 Route::get('/course-register', function () {
     return Inertia::render('CourseRegister'); // Assuming the view name is still Register.vue
 })->name('course-register');
+
+
+Route::post('/watchlist', [WatchListController::class, 'store'])->name('watchlist.store');
+Route::get('/watchlist', [WatchListController::class, 'index'])->name('watchlist.index');
+// Route::get('/watchlist', [WatchListController::class, 'drop'])->name('watchlist.drop');
+
 
 require __DIR__.'/auth.php';
