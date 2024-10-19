@@ -31,7 +31,7 @@ function createColumns({
             render(row) {
                 return h(
                     NButton,
-                    {
+                    {   
                         size: "small",
                         onClick: () => registerCourse(row)
                     },
