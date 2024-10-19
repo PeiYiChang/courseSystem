@@ -35,14 +35,19 @@ Route::post('/finder', [CourseController::class, 'filter'])->name('course.filter
 Route::post('/course-register', [CourseController::class, 'register'])->name('course.register');
 Route::post('/course-drop', [CourseController::class, 'drop'])->name('course.drop');
 
+// retrun course-register view
 Route::get('/course-register', function () {
-    return Inertia::render('CourseRegister'); // Assuming the view name is still Register.vue
+    return Inertia::render('CourseRegister'); 
 })->name('course-register');
 
+Route::get('/watchListManagement', function () {
+    return Inertia::render('watchListManagement'); 
+})->name('watchListManagement');
 
-Route::post('/watchlist', [WatchListController::class, 'store'])->name('watchlist.store');
+Route::post('/watchlist/add', [WatchListController::class, 'store'])->name('watchlist.store');
+Route::post('/watchlist/remove', [WatchListController::class, 'drop'])->name('watchlist.remove');
 Route::get('/watchlist', [WatchListController::class, 'index'])->name('watchlist.index');
-// Route::get('/watchlist', [WatchListController::class, 'drop'])->name('watchlist.drop');
+
 
 
 require __DIR__.'/auth.php';

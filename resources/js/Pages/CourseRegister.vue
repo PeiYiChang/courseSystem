@@ -6,7 +6,7 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import DangerButton from '@/Components/DangerButton.vue';
 import Table from '@/Components/Table.vue';
-import WatchList from '@/Components/WatchList.vue';
+import WatchList from '@/Components/CMwatchList.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { NCollapse } from 'naive-ui';
 import axios from 'axios';
@@ -21,49 +21,11 @@ const form = useForm({
     courseID: ''
 });
 
-// const submit = () => {
-//     form.post(route('course.filter'), {
-//         onSuccess: () => form.reset(),
-//         //onFailure: () => form.reset()
-//     });
-// };
-// const props = defineProps({
-//     watchListData: Array // The filtered courses passed from the controller
-// });
-// const submit = () => {
-//     form.get(route('watchlist.index'), {
-//         onSuccess: () => form.reset(),
-//     });
-// };
 const clear = () => {
     form.reset();
 };
 
-const updateWatchList = () => {
-    console.log('Updating watchlist...');
-    get(route('watchlist.index'))
-    
-};
 
-// const watchListData = ref([]);
-
-// onMounted(() => {
-//     axios.get(route('watchlist.index'))
-//     .then(response => {
-//             // Check if response.data is an array
-//             if (Array.isArray(response.data)) {
-//                 watchListData.value = response.data.map(course => ({
-//                     label: course.courseTitle, // Adjust the key to match your structure
-//                     key: course.courseID
-//                 }));
-//             }else{
-//                 console.log("not an array, response data:", response.data);
-//             }
-//         })
-//         .catch(error => {
-//             console.error("Error fetching watchlist data:", error);
-//         });
-// });
 
 
 </script>

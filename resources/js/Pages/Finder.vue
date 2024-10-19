@@ -6,7 +6,7 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import DangerButton from '@/Components/DangerButton.vue';
 import Table from '@/Components/Table.vue';
-import DataTable from '@/Components/FilteredCourse.vue';
+import FilteredCourse from '@/Components/FilteredCourse.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 
 
@@ -161,7 +161,7 @@ const props = defineProps({
                             Filtered Courses
                         </h2>
                         <!-- <Table/> -->
-                        <DataTable :data="courses" />
+                        <FilteredCourse :data="courses" />
                 </div>
             </div>
         </form>

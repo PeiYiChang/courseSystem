@@ -35,6 +35,10 @@ const showingNavigationDropdown = ref(false);
                                     Finder
                                 </NavLink>
 
+                                <NavLink :href="route('watchListManagement')" :active="route().current('watchListManagement')">
+                                    WatchList
+                                </NavLink>
+
                                 <NavLink :href="route('course-register')" :active="route().current('course-register')">
                                     Course Management
                                 </NavLink>

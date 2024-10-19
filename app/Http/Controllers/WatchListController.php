@@ -10,8 +10,27 @@ use Inertia\Inertia;
 
 class WatchListController extends Controller
 {
+    public function store(Request $request) {
+        $courseID = $request->courseID;
+        $user = Auth::user();
+        $studentID = $user->studentID;
+    
+        WatchList::updateOrCreate(
+            ['studentID' => $studentID, 'courseID' => $courseID],  // Search for duplicarte
+            ['studentID' => $studentID, 'courseID' => $courseID]   // if found, do nothing, else create a new one
+        );
+    }
+
+    public function drop(Request $request) {
+        $courseID = $request->courseID;
+        $user = Auth::user();
+        $studentID = $user->studentID;
+
+        WatchList::where('studentID', $studentID)->where('courseID', $courseID)->delete();
+    }
+
     public function index()
-{
+    {
 
     $user = Auth::user();
     $studentID = $user->studentID;
@@ -74,15 +93,9 @@ class WatchListController extends Controller
             'time' => $time,
         ];
     }
-
-    // Debugging output for formatted courses
-    // dd($formattedCourses);
-
-    // Return the formatted courses to the view using Inertia
-    //return Inertia::render('WatchList', ['watchListData' => $formattedCourses]);    
+  
     return response()->json($formattedCourses);
 }
 
-    
 }
 
