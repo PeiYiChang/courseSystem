@@ -8,131 +8,111 @@ use Inertia\Inertia;
 
 class CourseController extends Controller
 {
-    public function filter(Request $request)
-{   
-    $request->validate([
-        'courseID' => 'nullable|string',
-        'courseTitle' => 'nullable|string',
-        'courseInstructor' => 'nullable|string',
-        'courseDay' => 'nullable|integer',
-        'coursePeriod' => 'nullable|integer',
-    ]);
-    
-    $query = Course::query();
-    if ($request->filled('courseID')) {
-        $query->where('courseID', $request->input('courseID'));
-    }
-    if ($request->filled('courseTitle')) {
-        $query->where('courseTitle', 'like', '%' . $request->input('courseTitle') . '%');
-    }
-    if ($request->filled('courseInstructor')) {
-        $query->where('instructor', 'like', '%' . $request->input('courseInstructor') . '%');
-    }
-    if ($request->filled('courseDay')) {
-        $query->where('day', $request->input('courseDay'));
-    }
-    if ($request->filled('coursePeriod')) {
-        $query->where('period', $request->input('coursePeriod'));
-    }
-    $courses = $query->get();
-    // take all the unique course IDs out due to how I store data
-    $uniqueCourseIDs = $courses->pluck('courseID')->unique()->toArray();
-
-    // fetch all courses info with the unique IDs
-    $allCourses = Course::whereIn('courseID', $uniqueCourseIDs)->get();
-
-    $groupedCourses = $allCourses->groupBy('courseID');
-
-    $formattedCourses = [];
-    $dayMap = [
-        1 => 'Mon',
-        2 => 'Tue',
-        3 => 'Wed',
-        4 => 'Thu',
-        5 => 'Fri',
-        6 => 'Sat',
-        7 => 'Sun',
-    ];
-
-    
-    foreach ($groupedCourses as $courseID => $group) {
-        
-        $courseTitle = $group->first()->courseTitle;
-        $credit = $group->first()->credit;
-        $mandatory = $group->first()->mandatory;
-        $grade = $group->first()->grade;
-        $major = $group->first()->major;
-
-        $instructorList = $group->pluck('instructor')->unique()->implode(', ');
-
-        $timeSegments = $group->map(function ($course) use ($dayMap) {
-            return $dayMap[$course->day] . '-' . $course->period; 
-        })->unique(); 
-
-        $time = $timeSegments->implode(', ');
-
-        $formattedCourses[] = [
-            'id' => $courseID,
-            'courseID' => $courseID,
-            'courseTitle' => $courseTitle,
-            'credit' => $credit,
-            'mandatory' => $mandatory,
-            'instructor' => $instructorList,
-            'grade' => $grade,
-            'major' => $major,
-            'time' => $time,
+    // Reusable function to format course data
+    private function formatCourses($courses)
+    {
+        $dayMap = [
+            1 => 'Mon',
+            2 => 'Tue',
+            3 => 'Wed',
+            4 => 'Thu',
+            5 => 'Fri',
+            6 => 'Sat',
+            7 => 'Sun',
         ];
+
+        // Group courses by courseID
+        $groupedCourses = $courses->groupBy('courseID');
+        $formattedCourses = [];
+
+        foreach ($groupedCourses as $courseID => $group) {
+            $courseTitle = $group->first()->courseTitle;
+            $credit = $group->first()->credit;
+            $mandatory = $group->first()->mandatory;
+            $grade = $group->first()->grade;
+            $major = $group->first()->major;
+            $instructorList = $group->pluck('instructor')->unique()->implode(', ');
+
+            // Combine day and period
+            $timeSegments = $group->map(function ($course) use ($dayMap) {
+                return $dayMap[$course->day] . '-' . $course->period;
+            })->unique();
+
+            $time = $timeSegments->implode(', ');
+
+            $formattedCourses[] = [
+                'id' => $courseID,
+                'courseID' => $courseID,
+                'courseTitle' => $courseTitle,
+                'credit' => $credit,
+                'mandatory' => $mandatory,
+                'instructor' => $instructorList,
+                'grade' => $grade,
+                'major' => $major,
+                'time' => $time,
+            ];
+        }
+
+        return $formattedCourses;
     }
 
-    return Inertia::render('Finder', ['courses' => $formattedCourses]);
-}
+    public function filter(Request $request)
+    {
+        $request->validate([
+            'courseID' => 'nullable|string',
+            'courseTitle' => 'nullable|string',
+            'courseInstructor' => 'nullable|string',
+            'courseDay' => 'nullable|integer',
+            'coursePeriod' => 'nullable|integer',
+        ]);
+        
+        $query = Course::query();
+        
+        if ($request->filled('courseID')) {
+            $query->where('courseID', $request->input('courseID'));
+        }
+        if ($request->filled('courseTitle')) {
+            $query->where('courseTitle', 'like', '%' . $request->input('courseTitle') . '%');
+        }
+        if ($request->filled('courseInstructor')) {
+            $query->where('instructor', 'like', '%' . $request->input('courseInstructor') . '%');
+        }
+        if ($request->filled('courseDay')) {
+            $query->where('day', $request->input('courseDay'));
+        }
+        if ($request->filled('coursePeriod')) {
+            $query->where('period', $request->input('coursePeriod'));
+        }
 
-public function indexOne(Request $request)
-{
-    // Validate that courseID is present in the request
-    $request->validate([
-        'courseID' => 'required|string', // Adjust validation rules as needed
-    ]);
+        // Get all matching courses
+        $courses = $query->get();
 
-    // Get the courseID from the request
-    $courseID = $request->input('courseID');
+        // Get unique course IDs and fetch all associated data
+        $uniqueCourseIDs = $courses->pluck('courseID')->unique()->toArray();
+        $allCourses = Course::whereIn('courseID', $uniqueCourseIDs)->get();
 
-    // Query the Course model for the specified courseID
-    $courseInfo = Course::where('courseID', $courseID)->first(); // Use first() to get a single course
+        // Format the courses using the reusable method
+        $formattedCourses = $this->formatCourses($allCourses);
 
-    // If the course is not found, you might want to handle that
-    if (!$courseInfo) {
-        return response()->json(['message' => 'Course not found'], 404);
+        return Inertia::render('Finder', ['courses' => $formattedCourses]);
     }
 
-    // Create a mapping for days
-    $dayMap = [
-        1 => 'Mon',
-        2 => 'Tue',
-        3 => 'Wed',
-        4 => 'Thu',
-        5 => 'Fri',
-        6 => 'Sat',
-        7 => 'Sun',
-    ];
+    public function indexOne(Request $request)
+    {
+        // Validate the request
+        $request->validate([
+            'courseID' => 'required|string',
+        ]);
 
-    // Format the course time directly in this method
-    $time = $dayMap[$courseInfo->day] . '-' . $courseInfo->period;
+        $courseID = $request->input('courseID');
 
-    // Format the course information
-    $formattedCourses = [
-        'id' => $courseInfo->id, // Assuming you want to return the model's ID
-        'courseID' => $courseInfo->courseID,
-        'courseTitle' => $courseInfo->courseTitle,
-        'credit' => $courseInfo->credit,
-        'mandatory' => $courseInfo->mandatory,
-        'instructor' => $courseInfo->instructor,
-        'grade' => $courseInfo->grade,
-        'major' => $courseInfo->major,
-        'time' => $time, // Use the formatted time directly
-    ];
+        // Fetch all courses with the given courseID
+        $courseInfo = Course::where('courseID', $courseID)->get();
 
-    return Inertia::render('CourseRegister', ['courseInfo' => [$formattedCourses]]); // Wrap in an array
-}
 
+        // Format the courses using the reusable method
+        $formattedCourses = $this->formatCourses($courseInfo);
+
+        return Inertia::render('CourseRegister', ['courseInfo' => $formattedCourses]);
+    }
 }

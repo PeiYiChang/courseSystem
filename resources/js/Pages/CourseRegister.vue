@@ -13,9 +13,6 @@ import { NCollapse } from 'naive-ui';
 import { ref, onMounted } from 'vue';
 import ShowCourseInfo from '@/Components/showCourseInfo.vue';
 
-// check if student is already enrolled in the class
-const has_course = ref(false);
-const searched = ref(false);
 
 // TO BE UPDATED: Filter area and Courses Index area can be seperated to two components => ease up the readability
 const form = useForm({
@@ -80,27 +77,10 @@ const props = defineProps({
                                 @click = "submit"
                                 >
                                 Search
-                                </SecondaryButton>
-                                
-                                <DangerButton 
-                                v-if="searched && has_course" 
-                                class="mt-1 block w-1/7"
-                                :class="{ 'opacity-25': form.processing }" 
-                                :disabled="form.processing"
-                                >
-                                Drop
-                                </DangerButton>
-
-                                <PrimaryButton 
-                                v-else-if="searched && !has_course" 
-                                class="mt-1 block w-1/7"
-                                :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                                    Add
-                                </PrimaryButton>
-                                
+                                </SecondaryButton>    
                             </div>
-                            <ShowCourseInfo :data="courseInfo" />
                         </div>
+                        <ShowCourseInfo :data="courseInfo" />
                     </div>
 
                 </div>

@@ -1,20 +1,20 @@
 <template>
     <div class="p-6">
         <n-space vertical :size="12">
-            <n-data-table :bordered="true" :columns="columns" :data="data" :pagination="pagination" />
+            <n-data-table :bordered="true" :columns="columns" :data="data" />
         </n-space>
     </div>
 </template>
 
 <script>
-import { defineComponent, h, ref, onMounted } from "vue";
-import { NButton, NTag, useMessage } from "naive-ui";
+import { defineComponent, h, ref, onMounted, watch } from "vue";
+import { NButton } from "naive-ui";
 
 
 function createColumns({
-    addToWatchList,
-    removeFromWatchList,
-    watchList
+    registerCourse,
+    deregisterCourse,
+    classEnrollment,
 }) {
     return [
         { title: "ID", key: "courseID" },
@@ -29,21 +29,22 @@ function createColumns({
             title: "Enrollment",
             key: "actions",
             render(row) {
-                const isInWatchList = watchList.has(row.courseID)
+                const isEnrolled = classEnrollment.includes(String(row.courseID))
+
                 return h(
                     NButton,
                     {
-                        type: isInWatchList ? "error" : "primary",
+                        type: isEnrolled ? "error" : "primary",
                         size: "small",
                         onClick: () => {
-                            if(isInWatchList) {
-                                removeFromWatchList(row);
-                            }else{
-                                addToWatchList(row);
+                            if (isEnrolled) {
+                                deregisterCourse(row);
+                            } else {
+                                registerCourse(row);
                             }
                         }
                     },
-                    { default: () => (isInWatchList ? "Remove" : "Add") }
+                    { default: () => (isEnrolled ? "de-register" : "register") }
                 );
             }
         }
@@ -60,72 +61,71 @@ export default defineComponent({
     },
     setup(props) {
         console.log(props.data); // Check what data is received
-        const watchList = ref(new Set());
-        console.log(watchList.value); 
+        const classEnrollment = ref([]);
+        const localData = ref([]);
+
+        watch(() => props.data, (newData) => {
+            localData.value = newData;
+        }, { immediate: true });
+        
         onMounted(() => {
-            axios.get(route('watchlist.index'), {
+            localData.value = [];
+            axios.get(route('enrollment.index'), {
 
             })
                 .then(response => {
-                    response.data.forEach(course => {
-                        watchList.value.add(course.courseID);
+                    console.log('Response Data:', response.data);
+                        response.data.forEach(courseID => {
+                        classEnrollment.value.push(String(courseID));
                     });
                     console.log('Success:', response.data);
-                    console.log([...watchList.value]); 
+                    console.log([...classEnrollment.value]);
+
                 })
                 .catch(error => {
                     console.error('Error:', error.response.data);
                 });
+            
+                window.addEventListener('beforeunload', () => {
+                localData.value = [];
+            });
+                
         })
-        const addToWatchList = (row) => {
-            
-                console.log(`Adding course ${row.courseID} to watchlist.`);
-                axios.post(route('watchlist.store'), {
-                    courseID: row.courseID
-                })
-                    .then(response => {
-                        watchList.value.add(row.courseID); 
-                        //console.log('Success:', response.data);
-                    })
-                    .catch(error => {
-                        console.error('Error:', error.response.data);
-                    });
-            
-        }
-
-        const removeFromWatchList = (row) => {
-            
-                // remove it from the watchlist table
-                axios.post(route('watchlist.remove'),{
-                    courseID: row.courseID
-                })
-                .then(response => {
-                    // tableData.value = tableData.value.filter(course => course.courseID !== row.courseID);
-                    watchList.value.delete(row.courseID);
-                    //console.log('Success:', response.data);
-                })
-                .catch(error => {
-                    console.error('Error:', error.response.data);
-                });
-                console.log(`remove ${row.courseID} from my watchlist`);
-            
-
-        }
-
-        
-        const columns = createColumns({
-            addToWatchList,
-            removeFromWatchList,
-            watchList: watchList.value
+        const registerCourse = async (row) => {
+    try {
+        await axios.post(route("enrollment.store"), {
+            courseID: row.courseID,
         });
-        const pagination = {
-            pageSize: 1,
-        };
+        classEnrollment.value.push(String(row.courseID)); // Add directly to the array
+    } catch (error) {
+        console.error("Error while registering course:", error);
+    }
+};
 
+const deregisterCourse = async (row) => {
+    try {
+        await axios.post(route("enrollment.remove"), {
+            courseID: row.courseID,
+        });
+        const index = classEnrollment.value.indexOf(String(row.courseID));
+        if (index > -1) {
+            classEnrollment.value.splice(index, 1); // Remove from the array
+        }
+    } catch (error) {
+        console.error("Error while deregistering course:", error);
+    }
+};
+
+
+        const columns = createColumns({
+            registerCourse,
+            deregisterCourse,
+            classEnrollment: classEnrollment.value
+        });
         return {
             columns,
-            pagination,
-            watchList,
+            classEnrollment,
+            localData,
         };
     }
 });

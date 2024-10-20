@@ -5,6 +5,7 @@ use App\Http\Controllers\CourseController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WatchListController;
+use App\Http\Controllers\EnrollmentController;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -48,7 +49,11 @@ Route::post('/watchlist/add', [WatchListController::class, 'store'])->name('watc
 Route::post('/watchlist/remove', [WatchListController::class, 'drop'])->name('watchlist.remove');
 Route::get('/watchlist', [WatchListController::class, 'index'])->name('watchlist.index');
 
-Route::post('/register', [EnrollmentController::class, 'register'])->name('enrollment.register');
-Route::post('/deregister', [EnrollmentController::class, 'deregister'])->name('enrollment.deregister');
 Route::get('indexOne', [CourseController::class, 'indexOne'])->name('filter.indexOne');
+
+Route::post('/enrollment-register', [EnrollmentController::class, 'register'])->name('enrollment.store');
+Route::post('/deregister', [EnrollmentController::class, 'deregister'])->name('enrollment.remove');
+Route::get('/enrollment', [EnrollmentController::class, 'index'])->name('enrollment.index');
+
+
 require __DIR__.'/auth.php';
