@@ -54,6 +54,7 @@ Route::get('indexOne', [CourseController::class, 'indexOne'])->name('filter.inde
 Route::post('/enrollment-register', [EnrollmentController::class, 'register'])->name('enrollment.store');
 Route::post('/deregister', [EnrollmentController::class, 'deregister'])->name('enrollment.remove');
 Route::get('/enrollment', [EnrollmentController::class, 'index'])->name('enrollment.index');
+Route::get('/enrollmentAll', [EnrollmentController::class, 'enrolledAll'])->name('enrollment.all');
 
 
 require __DIR__.'/auth.php';

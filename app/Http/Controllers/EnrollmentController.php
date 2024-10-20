@@ -47,5 +47,67 @@ public function index(){
     return response()->json($courseIDs);
 }
 
+private function formatCourses($courses)
+{
+    $dayMap = [
+        1 => 'Mon',
+        2 => 'Tue',
+        3 => 'Wed',
+        4 => 'Thu',
+        5 => 'Fri',
+        6 => 'Sat',
+        7 => 'Sun',
+    ];
+
+    // Group courses by courseID
+    $groupedCourses = $courses->groupBy('courseID');
+    $formattedCourses = [];
+
+    foreach ($groupedCourses as $courseID => $group) {
+        $courseTitle = $group->first()->courseTitle;
+        $credit = $group->first()->credit;
+        $mandatory = $group->first()->mandatory;
+        $grade = $group->first()->grade;
+        $major = $group->first()->major;
+        $instructorList = $group->pluck('instructor')->unique()->implode(', ');
+
+        // Combine day and period
+        $timeSegments = $group->map(function ($course) use ($dayMap) {
+            return $dayMap[$course->day] . '-' . $course->period;
+        })->unique();
+
+        $time = $timeSegments->implode(', ');
+
+        $formattedCourses[] = [
+            'id' => $courseID,
+            'courseID' => $courseID,
+            'courseTitle' => $courseTitle,
+            'credit' => $credit,
+            'mandatory' => $mandatory,
+            'instructor' => $instructorList,
+            'grade' => $grade,
+            'major' => $major,
+            'time' => $time,
+        ];
+    }
+
+    return $formattedCourses;
+}
+
+public function enrolledAll()
+{
+    $user = Auth::user();
+    $studentID = $user->studentID;
+
+    // Get distinct courseIDs that the student is enrolled in
+    $courseIDs = Enrollment::where('studentID', $studentID)->distinct()->pluck('courseID');
+
+    // Fetch all the course information for the enrolled courses using `whereIn`
+    $courseInfo = Course::whereIn('courseID', $courseIDs)->get();
+
+    
+    return response()->json($courseInfo);
+}
+
 
 }

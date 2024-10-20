@@ -62,14 +62,8 @@ export default defineComponent({
     setup(props) {
         console.log(props.data); // Check what data is received
         const classEnrollment = ref([]);
-        const localData = ref([]);
 
-        watch(() => props.data, (newData) => {
-            localData.value = newData;
-        }, { immediate: true });
-        
         onMounted(() => {
-            localData.value = [];
             axios.get(route('enrollment.index'), {
 
             })
@@ -85,10 +79,6 @@ export default defineComponent({
                 .catch(error => {
                     console.error('Error:', error.response.data);
                 });
-            
-                window.addEventListener('beforeunload', () => {
-                localData.value = [];
-            });
                 
         })
         const registerCourse = async (row) => {
@@ -125,7 +115,6 @@ const deregisterCourse = async (row) => {
         return {
             columns,
             classEnrollment,
-            localData,
         };
     }
 });
