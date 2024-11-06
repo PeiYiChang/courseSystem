@@ -75,12 +75,20 @@ export default defineComponent({
 
         const registerCourse = async (row) => {
             try {
+                // register course
                 await axios.post(route("enrollment.store"), {
                     courseID: row.courseID,
                 });
                 classEnrollment.value.push(String(row.courseID));
+                
+                // update user credit
+                await axios.post(route("user.addCredit"), {
+                    courseID: row.courseID,
+                }).then(response => {
+                    alert(response.data.message);  // 顯示成功訊息
+                });
             } catch (error) {
-                console.error("Error while registering course:", error);
+                alert("Error while registering course:", error);
             }
         };
 
@@ -93,6 +101,13 @@ export default defineComponent({
                 if (index > -1) {
                     classEnrollment.value.splice(index, 1);
                 }
+                // update user credit
+                await axios.post(route("user.deletCredit"), {
+                    courseID: row.courseID,
+                }).then(response => {
+                        alert(response.data.message);  // 顯示成功訊息
+                })
+                
             } catch (error) {
                 console.error("Error while deregistering course:", error);
             }

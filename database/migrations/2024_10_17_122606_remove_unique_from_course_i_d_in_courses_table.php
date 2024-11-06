@@ -9,9 +9,9 @@ return new class extends Migration
 
     public function up(): void
     {
-        Schema::table('courses', function (Blueprint $table) {
-            $table->dropUnique(['courseID']); // Drop the unique constraint
-        });
+        //Schema::table('courses', function (Blueprint $table) {
+        //    $table->dropUnique(['courseID']); // Drop the unique constraint
+        //});
     }
 
 

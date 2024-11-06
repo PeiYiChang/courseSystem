@@ -15,12 +15,13 @@ class EnrollmentController extends Controller
         $courseID = $request->courseID;
         $user = Auth::user();
         $studentID = $user->studentID;
-
-        Enrollment::updateOrCreate(
-            ['studentID' => $studentID, 'courseID' => $courseID],  // Search for duplicarte
-            ['studentID' => $studentID, 'courseID' => $courseID]   // if found, do nothing, else create a new one
-        );
-        return response()->json(['message' => 'Successfully registered for the course']);
+        if($user->credit < 25){
+            Enrollment::updateOrCreate(
+                ['studentID' => $studentID, 'courseID' => $courseID],  // Search for duplicarte
+                ['studentID' => $studentID, 'courseID' => $courseID]   // if found, do nothing, else create a new one
+            );
+            return response()->json(['message' => 'Successfully registered for the course']);
+        }
 }
     
 
@@ -28,9 +29,10 @@ class EnrollmentController extends Controller
         $courseID = $request->courseID;
         $user = Auth::user();
         $studentID = $user->studentID;
-
-        Enrollment::where('studentID', $studentID)->where('courseID', $courseID)->delete();
-        return response()->json(['message' => 'Successfully deregistered from the course']);
+        if($user->credit > 9){
+            Enrollment::where('studentID', $studentID)->where('courseID', $courseID)->delete();
+            return response()->json(['message' => 'Successfully deregistered from the course']);
+        }
 }
 
     

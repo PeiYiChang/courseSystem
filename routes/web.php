@@ -6,6 +6,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WatchListController;
 use App\Http\Controllers\EnrollmentController;
+use App\Http\Controllers\UserController;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -31,6 +32,7 @@ Route::middleware('auth')->group(function () {
 Route::get('/finder', function (){
     return Inertia::render('Finder');
 })->name('finder');
+Route::get('/user', [UserController::class, 'index']);
 
 Route::post('/finder', [CourseController::class, 'filter'])->name('course.filter');
 Route::post('/course-register', [CourseController::class, 'register'])->name('course.register');
@@ -55,6 +57,6 @@ Route::post('/enrollment-register', [EnrollmentController::class, 'register'])->
 Route::post('/deregister', [EnrollmentController::class, 'deregister'])->name('enrollment.remove');
 Route::get('/enrollment', [EnrollmentController::class, 'index'])->name('enrollment.index');
 Route::get('/enrollmentAll', [EnrollmentController::class, 'enrolledAll'])->name('enrollment.all');
-
-
+Route::post('/user/add-credit', [UserController::class, 'addCredit'])->name('user.addCredit');
+Route::post('/user/delet-credit', [UserController::class, 'deletCredit'])->name('user.deletCredit');
 require __DIR__.'/auth.php';

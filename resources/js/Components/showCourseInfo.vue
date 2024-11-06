@@ -82,29 +82,44 @@ export default defineComponent({
                 
         })
         const registerCourse = async (row) => {
-    try {
-        await axios.post(route("enrollment.store"), {
-            courseID: row.courseID,
-        });
-        classEnrollment.value.push(String(row.courseID)); // Add directly to the array
-    } catch (error) {
-        console.error("Error while registering course:", error);
-    }
-};
+            try {
+                // register course
+                await axios.post(route("enrollment.store"), {
+                    courseID: row.courseID,
+                });
+                classEnrollment.value.push(String(row.courseID));
+                
+                // update user credit
+                await axios.post(route("user.addCredit"), {
+                    courseID: row.courseID,
+                }).then(response => {
+                    alert(response.data.message);  // 顯示成功訊息
+                });
+            } catch (error) {
+                alert("Error while registering course:", error);
+            }
+        };
 
-const deregisterCourse = async (row) => {
-    try {
-        await axios.post(route("enrollment.remove"), {
-            courseID: row.courseID,
-        });
-        const index = classEnrollment.value.indexOf(String(row.courseID));
-        if (index > -1) {
-            classEnrollment.value.splice(index, 1); // Remove from the array
-        }
-    } catch (error) {
-        console.error("Error while deregistering course:", error);
-    }
-};
+        const deregisterCourse = async (row) => {
+            try {
+                await axios.post(route("enrollment.remove"), {
+                    courseID: row.courseID,
+                });
+                const index = classEnrollment.value.indexOf(String(row.courseID));
+                if (index > -1) {
+                    classEnrollment.value.splice(index, 1);
+                }
+                // update user credit
+                await axios.post(route("user.deletCredit"), {
+                    courseID: row.courseID,
+                }).then(response => {
+                        alert(response.data.message);  // 顯示成功訊息
+                })
+                
+            } catch (error) {
+                console.error("Error while deregistering course:", error);
+            }
+        };
 
 
         const columns = createColumns({
