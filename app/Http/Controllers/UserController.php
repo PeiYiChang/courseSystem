@@ -19,11 +19,18 @@ class UserController extends Controller
         if ($course) {
             if($user->credit >= 25){
                 return response()->json([
-                    'message' => 'Failed!!! You cannot add more course!'
+                    'message' => 'Failed!!! You cannot add more courses!'
                 ]);
-            }else{
+            }elseif ($course->maxCapacity <= $course->currentCapacity) {
+                return response()->json([
+                    'message' => 'Failed! Course is full.'
+                ]);
+            }
+            else{
                 $user->credit += $course->credit;  // 增加學分
                 $user->save();  // 保存使用者資料
+                $course->currentCapacity +=1;
+                $course->save();
                 return response()->json([
                     'message' => 'Course added successfully'
                 ]);
@@ -35,7 +42,8 @@ class UserController extends Controller
             ], 404);
         }
     }
-    public function deletCredit(Request $request)
+    
+    public function deleteCredit(Request $request)
     {
         $user = Auth::user();
         $courseID = $request->courseID;
@@ -43,11 +51,17 @@ class UserController extends Controller
         if ($course) {
             if($user->credit <= 9){
                 return response()->json([
-                    'message' => 'Failed!!! You cannot remove more course!'
+                    'message' => 'Failed!!! You cannot remove more courses!'
+                ]);
+            }else if($course->mandatory == 1){
+                return response()->json([
+                    'message' => 'Failed!!! You cannot remove this course!'
                 ]);
             }else{
                 $user->credit -= $course->credit;
                 $user->save();
+                $course->currentCapacity -=1;
+                $course->save();
                 return response()->json([
                     'message' => 'Course removed successfully'
                 ]);

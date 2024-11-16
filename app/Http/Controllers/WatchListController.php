@@ -71,6 +71,8 @@ class WatchListController extends Controller
         $mandatory = $firstCourse->mandatory;
         $grade = $firstCourse->grade;
         $major = $firstCourse->major;
+        $maxCapacity = $firstCourse->maxCapacity;
+        $currentCapacity = $firstCourse->currentCapacity;
 
         // Get a unique list of instructors and the times for the course
         $instructorList = $group->pluck('instructor')->unique()->implode(', ');
@@ -91,6 +93,8 @@ class WatchListController extends Controller
             'grade' => $grade,
             'major' => $major,
             'time' => $time,
+            'maxCapacity' => $maxCapacity,
+            'currentCapacity' => $currentCapacity,
         ];
     }
   

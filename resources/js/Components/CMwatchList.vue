@@ -13,7 +13,7 @@
 
 <script>
 import { defineComponent, h, onMounted, ref } from "vue";
-import { NButton, NTag, useMessage } from "naive-ui";
+import { NButton } from "naive-ui";
 import axios from "axios";
 
 function createColumns({ registerCourse, deregisterCourse, classEnrollment }) {
@@ -21,18 +21,30 @@ function createColumns({ registerCourse, deregisterCourse, classEnrollment }) {
         { title: "ID", key: "courseID" },
         { title: "Title", key: "courseTitle" },
         { title: "Credit", key: "credit" },
-        { title: "Mandatory", key: "mandatory" },
+        {
+            title: "Mandatory",
+            key: "mandatory",
+            render(row) {
+                return row.mandatory === 1 ? 'Required courses' : 'Elective courses';
+            }
+        },
         { title: "Instructor", key: "instructor" },
         { title: "Department", key: "major" },
         { title: "Grade", key: "grade" },
         { title: "Time", key: "time" },
         {
+            title: "Students",
+            key: "students",  // Set a new key for this combined column
+            render(row) {
+                return `${row.currentCapacity} / ${row.maxCapacity}`;
+            }
+        },
+        {
             title: "Enrollment",
             key: "actions",
             render(row) {
-                // Convert both to strings for comparison
                 const currentCourseId = String(row.courseID);
-                const isEnrolled = classEnrollment.value.some(id => String(id) === currentCourseId);
+                const isEnrolled = classEnrollment.value.includes(currentCourseId);
                 
                 return h(
                     NButton,
@@ -66,7 +78,7 @@ export default defineComponent({
                 console.log('Watchlist Success:', watchlistResponse.data);
                 
                 const enrollmentResponse = await axios.get(route('enrollment.index'));
-                classEnrollment.value = enrollmentResponse.data;
+                classEnrollment.value = enrollmentResponse.data.map(id => String(id));  // Convert to string for consistency
                 console.log('Enrollment Success:', enrollmentResponse.data);
             } catch (error) {
                 console.error('Error fetching data:', error.response.data);
@@ -75,17 +87,22 @@ export default defineComponent({
 
         const registerCourse = async (row) => {
             try {
-                // register course
                 await axios.post(route("enrollment.store"), {
                     courseID: row.courseID,
                 });
-                classEnrollment.value.push(String(row.courseID));
-                
-                // update user credit
+
+                // Directly update the classEnrollment and tableData for immediate UI update
+                classEnrollment.value.push(String(row.courseID));  // Add to enrolled courses
+                const updatedCourse = tableData.value.find(course => course.courseID === row.courseID);
+                if (updatedCourse) {
+                    updatedCourse.currentCapacity += 1;  // Update course capacity
+                }
+
+                // Update user credit
                 await axios.post(route("user.addCredit"), {
                     courseID: row.courseID,
                 }).then(response => {
-                    alert(response.data.message);  // 顯示成功訊息
+                    alert(response.data.message);  // Display success message
                 });
             } catch (error) {
                 alert("Error while registering course:", error);
@@ -97,15 +114,23 @@ export default defineComponent({
                 await axios.post(route("enrollment.remove"), {
                     courseID: row.courseID,
                 });
+
+                // Directly update the classEnrollment and tableData for immediate UI update
                 const index = classEnrollment.value.indexOf(String(row.courseID));
                 if (index > -1) {
-                    classEnrollment.value.splice(index, 1);
+                    classEnrollment.value.splice(index, 1);  // Remove from enrolled courses
                 }
-                // update user credit
-                await axios.post(route("user.deletCredit"), {
+
+                const updatedCourse = tableData.value.find(course => course.courseID === row.courseID);
+                if (updatedCourse) {
+                    updatedCourse.currentCapacity -= 1;  // Decrease course capacity
+                }
+
+                // Update user credit
+                await axios.post(route("user.deleteCredit"), {
                     courseID: row.courseID,
                 }).then(response => {
-                        alert(response.data.message);  // 顯示成功訊息
+                        alert(response.data.message);  // Display success message
                 })
                 
             } catch (error) {

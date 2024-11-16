@@ -20,11 +20,24 @@ function createColumns({
         { title: "ID", key: "courseID" },
         { title: "Title", key: "courseTitle" },
         { title: "Credit", key: "credit" },
-        { title: "Mandatory", key: "mandatory" },
+        {
+            title: "Mandatory",
+            key: "mandatory",
+            render(row) {
+                return row.mandatory === 1 ? 'Required courses' : 'Elective courses';
+            }
+        },
         { title: "Instructor", key: "instructor" },
         { title: "Department", key: "major" },
         { title: "Grade", key: "grade" },
         { title: "Time", key: "time" },
+        {
+            title: "Students",
+            key: "students",  // Set a new key for this combined column
+            render(row) {
+                return `${row.currentCapacity} / ${row.maxCapacity}`;
+            }
+        },
         {
             title: "Enrollment",
             key: "actions",
@@ -110,7 +123,7 @@ export default defineComponent({
                     classEnrollment.value.splice(index, 1);
                 }
                 // update user credit
-                await axios.post(route("user.deletCredit"), {
+                await axios.post(route("user.deleteCredit"), {
                     courseID: row.courseID,
                 }).then(response => {
                         alert(response.data.message);  // 顯示成功訊息
