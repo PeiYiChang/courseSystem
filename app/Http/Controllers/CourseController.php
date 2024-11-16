@@ -31,6 +31,8 @@ class CourseController extends Controller
             $mandatory = $group->first()->mandatory;
             $grade = $group->first()->grade;
             $major = $group->first()->major;
+            $maxCapacity = $group->first()->maxCapacity;
+            $currentCapacity = $group->first()->currentCapacity;
             $instructorList = $group->pluck('instructor')->unique()->implode(', ');
 
             // Combine day and period
@@ -50,6 +52,8 @@ class CourseController extends Controller
                 'grade' => $grade,
                 'major' => $major,
                 'time' => $time,
+                'maxCapacity'=>$maxCapacity,
+                'currentCapacity'=>$currentCapacity,
             ];
         }
 

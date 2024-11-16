@@ -58,5 +58,5 @@ Route::post('/deregister', [EnrollmentController::class, 'deregister'])->name('e
 Route::get('/enrollment', [EnrollmentController::class, 'index'])->name('enrollment.index');
 Route::get('/enrollmentAll', [EnrollmentController::class, 'enrolledAll'])->name('enrollment.all');
 Route::post('/user/add-credit', [UserController::class, 'addCredit'])->name('user.addCredit');
-Route::post('/user/delet-credit', [UserController::class, 'deletCredit'])->name('user.deletCredit');
+Route::post('/user/delete-credit', [UserController::class, 'deleteCredit'])->name('user.deleteCredit');
 require __DIR__.'/auth.php';
