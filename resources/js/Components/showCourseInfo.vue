@@ -96,18 +96,17 @@ export default defineComponent({
         })
         const registerCourse = async (row) => {
             try {
-                // register course
-                await axios.post(route("enrollment.store"), {
-                    courseID: row.courseID,
-                });
-                classEnrollment.value.push(String(row.courseID));
-                
                 // update user credit
                 await axios.post(route("user.addCredit"), {
                     courseID: row.courseID,
                 }).then(response => {
                     alert(response.data.message);  // 顯示成功訊息
                 });
+                // register course
+                await axios.post(route("enrollment.store"), {
+                    courseID: row.courseID,
+                });
+                classEnrollment.value.push(String(row.courseID));
             } catch (error) {
                 alert("Error while registering course:", error);
             }
