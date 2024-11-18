@@ -87,23 +87,17 @@ export default defineComponent({
 
         const registerCourse = async (row) => {
             try {
-                await axios.post(route("enrollment.store"), {
-                    courseID: row.courseID,
-                });
-
-                // Directly update the classEnrollment and tableData for immediate UI update
-                classEnrollment.value.push(String(row.courseID));  // Add to enrolled courses
-                const updatedCourse = tableData.value.find(course => course.courseID === row.courseID);
-                if (updatedCourse) {
-                    updatedCourse.currentCapacity += 1;  // Update course capacity
-                }
-
-                // Update user credit
+                // update user credit
                 await axios.post(route("user.addCredit"), {
                     courseID: row.courseID,
                 }).then(response => {
-                    alert(response.data.message);  // Display success message
+                    alert(response.data.message);  // 顯示成功訊息
                 });
+                // register course
+                await axios.post(route("enrollment.store"), {
+                    courseID: row.courseID,
+                });
+                classEnrollment.value.push(String(row.courseID));
             } catch (error) {
                 alert("Error while registering course:", error);
             }
