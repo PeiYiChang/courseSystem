@@ -16,7 +16,7 @@ class EnrollmentController extends Controller
         $course = Course::where('courseID', $courseID)->get();  // get all time (3)
         $user = Auth::user();
         $studentID = $user->studentID;
-        if(($user->credit < 25) && ($course->first()->maxCapacity > $course->first()->currentCapacity)){
+        if(($user->credit + $course->first()->credit < 25) && ($course->first()->maxCapacity > $course->first()->currentCapacity)){
             foreach ($course as $courseItem) {
                 if ($this->scheduleConflict($courseItem, $studentID)) {
                     return response()->json(['message' => 'There is a schedule conflict with another course.']);
@@ -64,7 +64,7 @@ class EnrollmentController extends Controller
         $course = Course::where('courseID', $courseID)->first();
         $user = Auth::user();
         $studentID = $user->studentID;
-        if(($user->credit > 9) && ($course->mandatory == 0)){
+        if(($user->credit - $course->first()->credit > 9) && ($course->mandatory == 0)){
             Enrollment::where('studentID', $studentID)->where('courseID', $courseID)->delete();
             return response()->json(['message' => 'Successfully deregistered from the course']);
         }else {
