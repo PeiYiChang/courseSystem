@@ -1,21 +1,17 @@
 <template>
     <div class="p-6">
         <n-space vertical :size="12">
-            <n-data-table :bordered="true" :columns="columns" :data="data" />
+            <n-data-table :bordered="true" :columns="columns" :data="tableData" />
         </n-space>
     </div>
 </template>
 
 <script>
-import { defineComponent, h, ref, onMounted, watch } from "vue";
+import { defineComponent, h, ref, onMounted } from "vue";
 import { NButton } from "naive-ui";
+import axios from "axios";
 
-
-function createColumns({
-    registerCourse,
-    deregisterCourse,
-    classEnrollment,
-}) {
+function createColumns({ registerCourse, deregisterCourse, classEnrollment }) {
     return [
         { title: "ID", key: "courseID" },
         { title: "Title", key: "courseTitle" },
@@ -24,8 +20,8 @@ function createColumns({
             title: "Mandatory",
             key: "mandatory",
             render(row) {
-                return row.mandatory === 1 ? 'Required courses' : 'Elective courses';
-            }
+                return row.mandatory === 1 ? "Required courses" : "Elective courses";
+            },
         },
         { title: "Instructor", key: "instructor" },
         { title: "Department", key: "major" },
@@ -33,17 +29,16 @@ function createColumns({
         { title: "Time", key: "time" },
         {
             title: "Students",
-            key: "students",  // Set a new key for this combined column
+            key: "students",
             render(row) {
                 return `${row.currentCapacity} / ${row.maxCapacity}`;
-            }
+            },
         },
         {
             title: "Enrollment",
             key: "actions",
             render(row) {
-                const isEnrolled = classEnrollment.includes(String(row.courseID))
-
+                const isEnrolled = classEnrollment.includes(String(row.courseID));
                 return h(
                     NButton,
                     {
@@ -55,15 +50,14 @@ function createColumns({
                             } else {
                                 registerCourse(row);
                             }
-                        }
+                        },
                     },
                     { default: () => (isEnrolled ? "de-register" : "register") }
                 );
-            }
-        }
+            },
+        },
     ];
 }
-
 
 export default defineComponent({
     props: {
@@ -73,76 +67,82 @@ export default defineComponent({
         },
     },
     setup(props) {
-        console.log(props.data); // Check what data is received
+        // 初始化課程資料
+        const tableData = ref([...props.data]);
         const classEnrollment = ref([]);
 
+        // 獲取已選課程的資訊
         onMounted(() => {
-            axios.get(route('enrollment.index'), {
-
-            })
-                .then(response => {
-                    console.log('Response Data:', response.data);
-                        response.data.forEach(courseID => {
+            axios
+                .get(route("enrollment.index"))
+                .then((response) => {
+                    response.data.forEach((courseID) => {
                         classEnrollment.value.push(String(courseID));
                     });
-                    console.log('Success:', response.data);
-                    console.log([...classEnrollment.value]);
-
                 })
-                .catch(error => {
-                    console.error('Error:', error.response.data);
+                .catch((error) => {
+                    console.error("Error:", error.response.data);
                 });
-                
-        })
+        });
+
+        // 加選課程
         const registerCourse = async (row) => {
             try {
-                // update user credit
-                await axios.post(route("user.addCredit"), {
-                    courseID: row.courseID,
-                }).then(response => {
-                    alert(response.data.message);  // 顯示成功訊息
-                });
-                // register course
-                await axios.post(route("enrollment.store"), {
+                const enrollResponse = await axios.post(route("enrollment.store"), {
                     courseID: row.courseID,
                 });
-                classEnrollment.value.push(String(row.courseID));
+                alert(enrollResponse.data.message);
+
+                if (enrollResponse.data.message === "Course added successfully") {
+                    classEnrollment.value.push(String(row.courseID));
+                    const updatedCourse = tableData.value.find((course) => course.courseID === row.courseID);
+                    if (updatedCourse) {
+                        updatedCourse.currentCapacity += 1;
+                    }
+                } else {
+                    console.error(enrollResponse.data.message);
+                }
             } catch (error) {
-                alert("Error while registering course:", error);
+                console.error("Error while registering course:", error);
             }
         };
 
+        // 退選課程
         const deregisterCourse = async (row) => {
             try {
-                await axios.post(route("enrollment.remove"), {
+                const deregisterResponse = await axios.post(route("enrollment.remove"), {
                     courseID: row.courseID,
                 });
-                const index = classEnrollment.value.indexOf(String(row.courseID));
-                if (index > -1) {
-                    classEnrollment.value.splice(index, 1);
+                alert(deregisterResponse.data.message);
+
+                if (deregisterResponse.data.message === "Course deregistered successfully") {
+                    const index = classEnrollment.value.indexOf(String(row.courseID));
+                    if (index > -1) {
+                        classEnrollment.value.splice(index, 1);
+                    }
+                    const updatedCourse = tableData.value.find((course) => course.courseID === row.courseID);
+                    if (updatedCourse) {
+                        updatedCourse.currentCapacity -= 1;
+                    }
+                } else {
+                    console.error(deregisterResponse.data.message);
                 }
-                // update user credit
-                await axios.post(route("user.deleteCredit"), {
-                    courseID: row.courseID,
-                }).then(response => {
-                        alert(response.data.message);  // 顯示成功訊息
-                })
-                
             } catch (error) {
                 console.error("Error while deregistering course:", error);
             }
         };
 
-
         const columns = createColumns({
             registerCourse,
             deregisterCourse,
-            classEnrollment: classEnrollment.value
+            classEnrollment: classEnrollment.value,
         });
+
         return {
+            tableData, // 綁定到模板
             columns,
             classEnrollment,
         };
-    }
+    },
 });
 </script>

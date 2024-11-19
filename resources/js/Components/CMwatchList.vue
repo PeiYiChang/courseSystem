@@ -87,46 +87,53 @@ export default defineComponent({
 
         const registerCourse = async (row) => {
             try {
-                // update user credit
-                await axios.post(route("user.addCredit"), {
-                    courseID: row.courseID,
-                }).then(response => {
-                    alert(response.data.message);  // 顯示成功訊息
-                });
-                // register course
-                await axios.post(route("enrollment.store"), {
+                // 嘗試加選課程
+                const enrollResponse = await axios.post(route("enrollment.store"), {
                     courseID: row.courseID,
                 });
-                classEnrollment.value.push(String(row.courseID));
+                alert(enrollResponse.data.message);  // 顯示提示訊息
+
+                if (enrollResponse.data.message === "Course added successfully") {
+                    // 成功後更新 UI 狀態
+                    classEnrollment.value.push(String(row.courseID));  // 更新已加選課程
+
+                    // 更新對應課程的 currentCapacity
+                    const updatedCourse = tableData.value.find(course => course.courseID === row.courseID);
+                    if (updatedCourse) {
+                        updatedCourse.currentCapacity += 1; // 增加已選容量
+                    }
+                } else {
+                    console.error(enrollResponse.data.message);  // 顯示錯誤訊息
+                }
             } catch (error) {
-                alert("Error while registering course:", error);
+                alert("加選課程失敗，請稍後再試。");
+                console.error("Error while registering course:", error);
             }
         };
 
         const deregisterCourse = async (row) => {
             try {
-                await axios.post(route("enrollment.remove"), {
+                // 退選課程
+                const deregisterResponse = await axios.post(route("enrollment.remove"), {
                     courseID: row.courseID,
                 });
+                alert(deregisterResponse.data.message);  // 顯示提示訊息
 
-                // Directly update the classEnrollment and tableData for immediate UI update
-                const index = classEnrollment.value.indexOf(String(row.courseID));
-                if (index > -1) {
-                    classEnrollment.value.splice(index, 1);  // Remove from enrolled courses
+                if (deregisterResponse.data.message === "Course deregistered successfully") {
+                    // 更新 UI 狀態
+                    const index = classEnrollment.value.indexOf(String(row.courseID));
+                    if (index > -1) {
+                        classEnrollment.value.splice(index, 1);  // 移除已選課程
+                    }
+
+                    // 更新對應課程的 currentCapacity
+                    const updatedCourse = tableData.value.find(course => course.courseID === row.courseID);
+                    if (updatedCourse) {
+                        updatedCourse.currentCapacity -= 1;  // 減少已選容量
+                    }
+                } else {
+                    console.error(deregisterResponse.data.message);  // 顯示錯誤訊息
                 }
-
-                const updatedCourse = tableData.value.find(course => course.courseID === row.courseID);
-                if (updatedCourse) {
-                    updatedCourse.currentCapacity -= 1;  // Decrease course capacity
-                }
-
-                // Update user credit
-                await axios.post(route("user.deleteCredit"), {
-                    courseID: row.courseID,
-                }).then(response => {
-                        alert(response.data.message);  // Display success message
-                })
-                
             } catch (error) {
                 console.error("Error while deregistering course:", error);
             }
