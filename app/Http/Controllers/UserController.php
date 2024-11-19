@@ -22,7 +22,7 @@ class UserController extends Controller
             }
         }
         if ($course) {
-            if($user->credit + $course->first()->credit >= 25){
+            if($user->credit + $course->first()->credit > 25){
                 return response()->json([
                     'message' => 'Failed!!! You cannot add more courses!'
                 ]);
@@ -84,7 +84,7 @@ class UserController extends Controller
         $courseID = $request->courseID;
         $course = Course::where('courseID', $courseID)->get();  // get all time (3)
         if ($course) {
-            if($user->credit -$course->first()->credit <= 9){
+            if($user->credit -$course->first()->credit < 9){
                 return response()->json([
                     'message' => 'Failed!!! You cannot remove more courses!'
                 ]);
