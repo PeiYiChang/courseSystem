@@ -6,7 +6,6 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WatchListController;
 use App\Http\Controllers\EnrollmentController;
-use App\Http\Controllers\UserController;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -57,6 +56,4 @@ Route::post('/enrollment-register', [EnrollmentController::class, 'register'])->
 Route::post('/deregister', [EnrollmentController::class, 'deregister'])->name('enrollment.remove');
 Route::get('/enrollment', [EnrollmentController::class, 'index'])->name('enrollment.index');
 Route::get('/enrollmentAll', [EnrollmentController::class, 'enrolledAll'])->name('enrollment.all');
-Route::post('/user/add-credit', [UserController::class, 'addCredit'])->name('user.addCredit');
-Route::post('/user/delete-credit', [UserController::class, 'deleteCredit'])->name('user.deleteCredit');
 require __DIR__.'/auth.php';

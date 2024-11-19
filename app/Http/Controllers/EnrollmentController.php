@@ -6,27 +6,52 @@ use Illuminate\Http\Request;
 use App\Models\WatchList;
 use App\Models\Course;
 use App\Models\Enrollment;
+use App\Models\User; 
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class EnrollmentController extends Controller
 {
     public function register(Request $request) {
+        $user = Auth::user();  // 使用 Auth 來取得當前登入的使用者
         $courseID = $request->courseID;
         $course = Course::where('courseID', $courseID)->get();  // get all time (3)
-        $user = Auth::user();
         $studentID = $user->studentID;
-        if(($user->credit <= 25) && ($course->first()->maxCapacity > $course->first()->currentCapacity)){
+        if ($course) {
             foreach ($course as $courseItem) {
                 if ($this->scheduleConflict($courseItem, $studentID)) {
                     return response()->json(['message' => 'There is a schedule conflict with another course.']);
                 }
             }
-            Enrollment::updateOrCreate(
-                ['studentID' => $studentID, 'courseID' => $courseID],  // Search for duplicarte
-                ['studentID' => $studentID, 'courseID' => $courseID]   // if found, do nothing, else create a new one
-            );
-            return response()->json(['message' => 'Successfully registered for the course']);
+            if($user->credit + $course->first()->credit > 25){
+                return response()->json([
+                    'message' => 'Failed!!! You cannot add more courses!'
+                ]);
+            }elseif ($course->first()->maxCapacity <= $course->first()->currentCapacity) {
+                return response()->json([
+                    'message' => 'Failed! Course is full.'
+                ]);
+            }
+            else{
+                $user->credit += $course->first()->credit;  // 增加學分
+                $user->save();  // 保存使用者資料
+                foreach ($course as $courseItem) {
+                    $courseItem->currentCapacity +=1;
+                    $courseItem->save();
+                }
+                Enrollment::updateOrCreate(
+                    ['studentID' => $studentID, 'courseID' => $courseID],  // Search for duplicarte
+                    ['studentID' => $studentID, 'courseID' => $courseID]   // if found, do nothing, else create a new one
+                );
+                return response()->json([
+                    'message' => 'Course added successfully'
+                ]);
+            }
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Course not found'
+            ], 404);
         }
     }
 
@@ -60,15 +85,31 @@ class EnrollmentController extends Controller
     
 
     public function deregister(Request $request){
-        $courseID = $request->courseID;
-        $course = Course::where('courseID', $courseID)->first();
         $user = Auth::user();
+        $courseID = $request->courseID;
+        $course = Course::where('courseID', $courseID)->get();  // get all time (3)
         $studentID = $user->studentID;
-        if(($user->credit - $course->first()->credit >= 9) && ($course->mandatory == 0)){
-            Enrollment::where('studentID', $studentID)->where('courseID', $courseID)->delete();
-            return response()->json(['message' => 'Successfully deregistered from the course']);
-        }else {
-            return response()->json(['message' => 'Failed!']);
+        if ($course) {
+            if($user->credit -$course->first()->credit < 9){
+                return response()->json([
+                    'message' => 'Failed!!! You cannot remove more courses!'
+                ]);
+            }else if($course->first()->mandatory == 1){
+                return response()->json([
+                    'message' => 'Failed!!! You cannot remove this course!'
+                ]);
+            }else{
+                $user->credit -= $course->first()->credit;
+                $user->save();
+                foreach ($course as $courseItem) {
+                    $courseItem->currentCapacity -=1;
+                    $courseItem->save();
+                }
+                Enrollment::where('studentID', $studentID)->where('courseID', $courseID)->delete();
+                return response()->json(['message' => 'Course deregistered successfully']);
+            }
+        } else {
+            return response()->json(['error' => 'Course not found'], 404);
         }
     }
 

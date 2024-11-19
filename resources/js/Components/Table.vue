@@ -61,20 +61,24 @@ export default {
       timetable.value = newTimetable;
     };
 
-    onMounted(() => {
-      axios
-        .get(route('enrollment.all'))
-        .then((response) => {
-          classEnrollment.value = response.data;
-          console.log(classEnrollment.value);
+    const fetchData = () => {
+    axios
+      .get(route('enrollment.all'))
+      .then((response) => {
+        classEnrollment.value = response.data;
+        console.log(classEnrollment.value);
+        processEnrollmentData(response.data);
+      })
+      .catch((error) => {
+        console.error('Error:', error.response.data);
+      });
+  };
 
-          // Process the fetched data into the timetable
-          processEnrollmentData(response.data);
-        })
-        .catch((error) => {
-          console.error('Error:', error.response.data);
-        });
-    });
+  onMounted(() => {
+    // 每隔 1 秒鐘詢問一次
+    setInterval(fetchData, 1000);
+  });
+
 
     return {
       classEnrollment,
