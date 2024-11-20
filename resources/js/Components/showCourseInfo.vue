@@ -63,12 +63,13 @@ export default defineComponent({
     props: {
         data: {
             type: Array,
-            required: true,
+            required: false,
+            default: () => [], // 預設為空陣列
         },
     },
     setup(props) {
         // 初始化課程資料
-        const tableData = ref([...props.data]);
+        const tableData = ref(props.data || []);
         const classEnrollment = ref([]);
 
         // 獲取已選課程的資訊
